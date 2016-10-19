@@ -40,7 +40,7 @@ charActionMappings.press = {
 	["\17"]   = "mute",
 	["\18"]   = "volume_up",
 	["\19"]   = "volume_down",
-	["i"]  = "go_home_or_now_playing",
+	["i"]  = "go_now_playing_or_playlist",
 	["k"]  = "go_playlist",
 
 
