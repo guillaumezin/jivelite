@@ -14,6 +14,7 @@ local Framework         = require("jive.ui.Framework")
 local math              = require("math")
 local string            = require("string")
 local table             = require("jive.utils.table")
+--local debug             = require("jive.utils.debug")
 local log               = require("jive.utils.log").logger("jivelite.ui")
 local locale            = require("jive.utils.locale")
 local debug             = require("jive.utils.debug")
@@ -34,6 +35,14 @@ local EVENT_SCROLL      = jive.ui.EVENT_SCROLL
 local EVENT_WINDOW_RESIZE = jive.ui.EVENT_WINDOW_RESIZE
 local EVENT_CONSUME     = jive.ui.EVENT_CONSUME
 
+local EVENT_MOUSE_PRESS    = jive.ui.EVENT_MOUSE_PRESS
+local EVENT_MOUSE_DOWN     = jive.ui.EVENT_MOUSE_DOWN
+local EVENT_MOUSE_UP       = jive.ui.EVENT_MOUSE_UP
+local EVENT_MOUSE_MOVE     = jive.ui.EVENT_MOUSE_MOVE
+local EVENT_MOUSE_DRAG     = jive.ui.EVENT_MOUSE_DRAG
+local EVENT_MOUSE_HOLD     = jive.ui.EVENT_MOUSE_HOLD
+local EVENT_MOUSE_ALL      = jive.ui.EVENT_MOUSE_ALL
+
 local KEY_FWD           = jive.ui.KEY_FWD
 local KEY_REW           = jive.ui.KEY_REW
 local KEY_GO            = jive.ui.KEY_GO
@@ -47,6 +56,8 @@ local KEY_ADD           = jive.ui.KEY_ADD
 
 local NUMBER_LETTER_OVERSHOOT_TIME = 150 --ms
 local NUMBER_LETTER_TIMER_TIME = 1100 --ms
+local SIZE_TOUCH_LETTER = 20
+local SIZE_TOUCH_ENTER_DELETE = 80
 
 -- our class
 module(...)
@@ -462,6 +473,7 @@ function _eventHandler(self, event)
 
 	if Framework:isMostRecentInput("ir") or
 		Framework:isMostRecentInput("key") or
+		Framework:isMostRecentInput("mouse") or
 		Framework:isMostRecentInput("scroll") then
 		self.cursorWidth = 1
 	else
@@ -601,6 +613,129 @@ function _eventHandler(self, event)
 		_scroll(self, self.scroll:event(event, idx, idx, 1, #v))
 		return EVENT_CONSUME
 
+	elseif type == EVENT_MOUSE_PRESS or type == EVENT_MOUSE_HOLD or type == EVENT_MOUSE_MOVE then
+		--no special handling, consume
+
+		return EVENT_CONSUME
+        
+	elseif type == EVENT_MOUSE_DRAG or type == EVENT_MOUSE_DOWN then
+                if false and not self:isTouchMouseEvent(event) then
+                        --disabling regular desktop mouse behavior - favoring drag style for now
+
+--				return self.scrollbar:_event(event)
+
+                else  --touchpad
+                        if type == EVENT_MOUSE_DOWN then
+                                self.dragOrigin.x, self.dragOrigin.y = event:getMouse();
+                                self.zoneOrigin = nil
+                                self.dragging = false
+                                
+                        else -- type == EVENT_MOUSE_DRAG
+                                if self.locked == nil then
+                                        self.numberLetterAccel:stopCurrentCharacter()
+                                        
+                                        if ( self.dragOrigin.x == nil) then
+                                                --might have started drag outside of this textarea's bounds, so reset origin
+                                                self.dragOrigin.x, self.dragOrigin.y = event:getMouse();
+                                                self.zoneOrigin = nil
+                                        end
+
+                                        local mouseX, mouseY = event:getMouse()
+
+                                        local dragAmountY = self.dragOrigin.y - mouseY
+                                        local dragAmountX = self.dragOrigin.x - mouseX
+                                        
+                                        local char_offset_y = self:styleValue("charOffsetY")
+                                        local wheel_char_offset_y = self:styleValue("wheelCharOffsetY")
+                                        local padding = self:styleValue("padding")
+                                        
+                                        local posX, posY = self:getPosition()
+                                        local sizX, sizY = self:getSize()
+                                        local sizeLetter = self:styleValue("wheelCharHeight")
+                                        local sizeBigLetter = self:styleValue("charHeight")
+                                        local zone
+                                        if (mouseY < (posY + padding[2] + sizY/2 - sizeBigLetter/2)) then
+                                            zone = math.floor((mouseY - (posY + padding[2] + sizY/2 - sizeBigLetter/2)) / sizeLetter)
+                                            --log:info("zone 1 "  .. mouseY .. " zone " .. zone)
+                                        elseif (mouseY > (posY + padding[2] + sizY/2 + sizeBigLetter/2)) then
+                                            zone = math.ceil((mouseY - (posY + padding[2] + sizY/2 + sizeBigLetter/2)) / sizeLetter)
+                                            --log:info("zone 3 "  .. mouseY .. " zone " .. zone)
+                                        else
+                                            zone = 0
+                                            --log:info("zone 2 "  .. mouseY .. " zone " .. zone)
+                                        end
+                                        
+                                        if ( self.zoneOrigin == nil) then
+                                            self.zoneOrigin = zone
+                                        end
+                                            
+                                        --local sw, sh = Framework:getScreenSize()
+                                        --local sizeLetter = self:styleValue("wheelCharHeight")
+                                        --local sizeBigLetter = self:styleValue("charHeight")
+                                        --if (mouseY < (sh - sizeBigLetter / 2)) then
+                                        --elseif (mouseY > (sh + sizeLetter / 2)) then
+                                        --else
+                                        --end
+                                        
+                                        -- for ui input types like ir and for input like ip or date, down/up scroll polarity will be reversed
+                                        local polarityModifier = 1
+                                        if not self:_reverseScrollPolarityOnUpDownInput() then
+                                                polarityModifier = -1
+                                        end
+                                        
+                                        if (zone > self.zoneOrigin) then
+                                                local amount = zone - self.zoneOrigin
+                                                _scroll(self, polarityModifier * amount)
+                                                self.zoneOrigin = zone
+                                                self.dragOrigin.x = mouseX
+                                                self.dragging = true
+                                        elseif (zone < self.zoneOrigin) then
+                                                local amount = zone - self.zoneOrigin
+                                                _scroll(self, polarityModifier * amount)
+                                                self.zoneOrigin = zone
+                                                self.dragOrigin.x = mouseX
+                                                self.dragging = true
+--                                         if (dragAmountY > SIZE_TOUCH_LETTER) then
+--                                                 local amount = -1 * math.floor(dragAmountY / SIZE_TOUCH_LETTER)
+--                                                 _scroll(self, polarityModifier * amount)
+--                                                 self.dragOrigin.x = mouseX
+--                                                 self.dragOrigin.y = self.dragOrigin.y + (amount * SIZE_TOUCH_LETTER)
+--                                                 self.dragging = true
+--                                         elseif (dragAmountY < (-1 * SIZE_TOUCH_LETTER)) then
+--                                                 local amount = -1 * math.ceil(dragAmountY / SIZE_TOUCH_LETTER)
+--                                                 _scroll(self, polarityModifier * amount)
+--                                                 self.dragOrigin.x = mouseX
+--                                                 self.dragOrigin.y = self.dragOrigin.y + (amount * SIZE_TOUCH_LETTER)
+--                                                 self.dragging = true
+                                        elseif (not self.dragging and (dragAmountX > SIZE_TOUCH_ENTER_DELETE)) then
+                                                local amount = -1 * math.floor(dragAmountX / SIZE_TOUCH_ENTER_DELETE)
+                                                self.dragOrigin.x = self.dragOrigin.x + (amount * SIZE_TOUCH_ENTER_DELETE)
+--                                                self.dragOrigin.y = mouseY
+                                                self.dragging = true
+                                                return _deleteAction(self)
+                                        elseif (not self.dragging and (dragAmountX < (-1 * SIZE_TOUCH_ENTER_DELETE))) then
+                                                local amount = -1 * math.floor(dragAmountX / SIZE_TOUCH_ENTER_DELETE)
+                                                self.dragOrigin.x = mouseX
+--                                                self.dragOrigin.y = mouseY
+                                                self.dragging = true
+                                                return _doneAction(self)
+                                        end                                    
+                                end
+                        end
+                end
+                return EVENT_CONSUME
+        
+	elseif type == EVENT_MOUSE_UP then
+		if not self.dragging then
+			if self:_cursorAtEnd() then
+				return _goAction(self)
+			else
+				return _cursorRightAction(self)
+			end
+                end                
+
+		return EVENT_UNUSED
+        
 	elseif type == EVENT_CHAR_PRESS then
 		self.numberLetterAccel:stopCurrentCharacter()
 
@@ -706,6 +841,10 @@ function __init(self, style, value, closure, allowedChars)
 	obj.cursor = 1
 	obj.indent = 0
 	obj.maxWidth = 0
+	obj.dragOrigin = {}
+        obj.zoneOrigin = nil
+	obj.dragging = false
+
 	obj.value = value
 
 	-- default cursor to end to string unless defaultCursorToStart true
@@ -715,6 +854,7 @@ function __init(self, style, value, closure, allowedChars)
 
 	if Framework:isMostRecentInput("ir") or
 		Framework:isMostRecentInput("key") or
+		Framework:isMostRecentInput("mouse") or
 		Framework:isMostRecentInput("scroll") then
 		obj.cursorWidth = 1
 	else
@@ -753,7 +893,7 @@ function __init(self, style, value, closure, allowedChars)
 	obj:addActionListener("scanner_rew", obj, _goToStartAction)
 	obj:addActionListener("scanner_fwd", obj, _goToEndAction)
 
-	obj:addListener(bit.bor(EVENT_CHAR_PRESS, EVENT_KEY_PRESS, EVENT_KEY_HOLD, EVENT_SCROLL, EVENT_WINDOW_RESIZE, EVENT_IR_ALL),
+	obj:addListener(bit.bor(EVENT_CHAR_PRESS, EVENT_KEY_PRESS, EVENT_KEY_HOLD, EVENT_SCROLL, EVENT_MOUSE_ALL, EVENT_WINDOW_RESIZE, EVENT_IR_ALL),
 			function(event)
 				return _eventHandler(obj, event)
 			end)
@@ -1056,6 +1196,7 @@ function ipAddressValue(default)
 		__tostring = function(obj)
 			if not (Framework:isMostRecentInput("ir")
 				or Framework:isMostRecentInput("key")
+                                or Framework:isMostRecentInput("mouse")
 				or Framework:isMostRecentInput("scroll")) then
 				return obj.str
 			end
@@ -1121,6 +1262,7 @@ function ipAddressValue(default)
 				-- keyboard input
 				if not (Framework:isMostRecentInput("ir")
 					or Framework:isMostRecentInput("key")
+                                        or Framework:isMostRecentInput("mouse")
 					or Framework:isMostRecentInput("scroll")) then
 					if #obj.v < 4 then
 						return "0123456789."
@@ -1189,6 +1331,7 @@ function ipAddressValue(default)
 				--bypass custom delete for touch
 				return (Framework:isMostRecentInput("ir")
 					or Framework:isMostRecentInput("key")
+                                        or Framework:isMostRecentInput("mouse")
 					or Framework:isMostRecentInput("scroll"))
 			end,
 

@@ -30,6 +30,8 @@ static Uint32 next_jive_origin = 0;
 struct jive_perfwarn perfwarn = { 0, 0, 0, 0, 0, 0 };
 
 
+#define REPEAT_TIMEOUT 60
+
 /* button hold threshold 1 seconds */
 #define HOLD_TIMEOUT 1000
 
@@ -71,6 +73,8 @@ static enum jive_mouse_state {
 static JiveKey key_mask = 0;
 
 static Uint32 key_timeout = 0;
+static Uint32 char_timeout = 0;
+static Uint32 char_code = 0;
 
 static Uint32 mouse_timeout = 0;
 static Uint32 mouse_long_timeout = 0;
@@ -1221,13 +1225,36 @@ static int process_event(lua_State *L, SDL_Event *event) {
 			// handle regular character keys ('a', 't', etc..)
 			if (event->type == SDL_KEYDOWN && event->key.keysym.unicode != 0) {
 				jevent.type = JIVE_EVENT_CHAR_PRESS;
-				if (event->key.keysym.sym == SDLK_BACKSPACE) {
+
+                                if (event->key.keysym.sym == SDLK_BACKSPACE) {
 					//special case for Backspace, where value set is not ascii value, instead pass backspace ascii value
 					jevent.u.text.unicode = 8;
 				} else {
 					jevent.u.text.unicode = event->key.keysym.unicode;
 				}
 			}
+                        else if (event->key.keysym.unicode == 0) {
+                                if (event->type == SDL_KEYDOWN && event->key.keysym.scancode == 121) {
+                                        jevent.type = JIVE_EVENT_CHAR_PRESS;
+                                        char_code = 'M';
+                                        jevent.u.text.unicode = char_code;
+                                        char_timeout = 0;
+                                } else if (event->type == SDL_KEYDOWN && event->key.keysym.scancode == 122) {
+                                        jevent.type = JIVE_EVENT_CHAR_PRESS;
+                                        char_code = SDLK_MINUS;
+                                        jevent.u.text.unicode = char_code;
+                                        // repeatable
+                                        char_timeout = now + REPEAT_TIMEOUT;
+                                } else if (event->type == SDL_KEYDOWN && event->key.keysym.scancode == 123) {
+                                        jevent.type = JIVE_EVENT_CHAR_PRESS;
+                                        char_code = SDLK_PLUS;
+                                        jevent.u.text.unicode = char_code;
+                                        // repeatable
+                                        char_timeout = now + REPEAT_TIMEOUT;
+                                } else {
+                                        char_timeout = 0;
+                                }
+                        }
 		}
 
 		/* handle pgup/upgn and cursors as repeatable keys */
@@ -1411,6 +1438,16 @@ static void process_timers(lua_State *L) {
 		jevent.type = JIVE_EVENT_KEY_HOLD;
 		jevent.u.key.code = key_mask;
 		key_state = KEY_STATE_SENT;
+
+		do_dispatch_event(L, &jevent);
+
+		key_timeout = 0;
+	}
+	
+	if (char_timeout && char_timeout < now) {
+                char_timeout = now + REPEAT_TIMEOUT;
+		jevent.type = JIVE_EVENT_CHAR_PRESS;
+		jevent.u.text.unicode = char_code;
 
 		do_dispatch_event(L, &jevent);
 
