@@ -6,4 +6,4 @@ This version can handle multimedia key volume up/down and mute buttons. This way
 
 In scripts directory, there are various script for raspbian, including boot script and Adafruit retrogame configuration.
 
-Please note that parameters of jivelite is hidden, unless Raspberry Pi is booted with 4th button (#27) is pressed.
+Please note that parameters of jivelite is hidden, unless JIVE_ADMIN environment variable is set. Look at example in scripts/raspbian/home/pi/bin/jivelite which will enable parameters menu only if Raspberry Pi is booted with 4th button (#27) pressed.
