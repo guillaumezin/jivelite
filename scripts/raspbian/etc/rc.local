@@ -31,6 +31,6 @@ fi
 
 /home/pi/Adafruit-Retrogame/retrogame &
 
-su -s /bin/bash -c "FRAMEBUFFER=/dev/fb1 startx" pi &
+su -s /bin/bash -c "FRAMEBUFFER=/dev/fb1 startx -- -nocursor" pi &
 
 exit 0

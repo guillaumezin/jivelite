@@ -1,8 +1,6 @@
 -- input to action mappings
 
 local Framework        = require("jive.ui.Framework")
-local string = require("string")
-
 module(..., Framework.constants)
 
 
@@ -27,7 +25,7 @@ charActionMappings.press = {
 	["s"]  = "sleep",
 	["q"]  = "power",
 	["k"]  = "power_on",
-	["i"]  = "power_off",
+	["i"]  = "go_now_playing_or_playlist",
 	["t"]  = "go_current_track_info",
 	["n"]  = "go_home_or_now_playing",
 	["m"]  = "create_mix",
@@ -37,14 +35,6 @@ charActionMappings.press = {
 	["e"]  = "scanner_rew",
 	["r"]  = "scanner_fwd",
 	["u"]  = "mute",
-
--- Multimedia keyboard
-	["\17"]   = "mute",
-	["\18"]   = "volume_up",
-	["\19"]   = "volume_down",
-	["i"]  = "go_now_playing_or_playlist",
-	["k"]  = "go_playlist",
-
 
 -- original
 	["/"]   = "go_search",

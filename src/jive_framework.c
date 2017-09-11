@@ -1226,8 +1226,7 @@ static int process_event(lua_State *L, SDL_Event *event) {
 			// handle regular character keys ('a', 't', etc..)
 			if (event->type == SDL_KEYDOWN && event->key.keysym.unicode != 0) {
 				jevent.type = JIVE_EVENT_CHAR_PRESS;
-
-                                if (event->key.keysym.sym == SDLK_BACKSPACE) {
+				if (event->key.keysym.sym == SDLK_BACKSPACE) {
 					//special case for Backspace, where value set is not ascii value, instead pass backspace ascii value
 					jevent.u.text.unicode = 8;
 				} else {
@@ -1255,7 +1254,7 @@ static int process_event(lua_State *L, SDL_Event *event) {
                                 } else {
                                         char_timeout = 0;
                                 }
-                        }
+			}
 		}
 
 		/* handle pgup/upgn and cursors as repeatable keys */
@@ -1444,7 +1443,7 @@ static void process_timers(lua_State *L) {
 
 		key_timeout = 0;
 	}
-	
+
 	if (char_timeout && char_timeout < now) {
                 char_timeout = now + REPEAT_TIMEOUT;
 		jevent.type = JIVE_EVENT_CHAR_PRESS;

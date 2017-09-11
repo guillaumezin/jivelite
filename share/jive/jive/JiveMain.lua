@@ -467,16 +467,18 @@ function JiveMain:jiveMainNodes(globalStrings)
 	jiveMain:addNode( { id = '_myMusic', iconStyle = 'hm_myMusic', node = 'hidden', text = _globalStrings:str("MY_MUSIC"), synthetic = true , hiddenWeight = 2  } )
 	jiveMain:addNode( { id = 'games', node = 'extras', text = _globalStrings:str("GAMES"), weight = 70  } )
         if (isadmin) then
-                jiveMain:addNode( { id = 'settings', iconStyle = 'hm_settings', node = 'home', noCustom = 1, text = _globalStrings:str("SETTINGS"), weight = 1005, })
-                jiveMain:addNode( { id = 'advancedSettings', iconStyle = 'hm_advancedSettings', node = 'settings', text = _globalStrings:str("ADVANCED_SETTINGS"), weight = 105, windowStyle = 'text_only' })
-                jiveMain:addNode( { id = 'screenSettings', iconStyle = 'hm_settingsScreen', node = 'settings', text = _globalStrings:str("SCREEN_SETTINGS"), weight = 60, windowStyle = 'text_only' })
-                jiveMain:addNode( { id = 'screenSettingsNowPlaying', node = 'screenSettings', text = _globalStrings:str("NOW_PLAYING"), windowStyle = 'text_only' })
-                jiveMain:addNode( { id = 'factoryTest', node = 'advancedSettings', noCustom = 1, text = _globalStrings:str("FACTORY_TEST"), weight = 120, windowStyle = 'text_only' })
-                jiveMain:addNode( { id = 'advancedSettingsBetaFeatures', node = 'advancedSettings', noCustom = 1, text = _globalStrings:str("BETA_FEATURES"), weight = 100, windowStyle = 'text_only' })
-                jiveMain:addNode( { id = 'networkSettings', node = 'advancedSettings', noCustom = 1, text = _globalStrings:str("NETWORK_NETWORKING"), weight = 100, windowStyle = 'text_only' })
-                jiveMain:addNode( { id = 'settingsAudio', iconStyle = "hm_settingsAudio", node = 'settings', noCustom = 1, text = _globalStrings:str("AUDIO_SETTINGS"), weight = 40, windowStyle = 'text_only' })
-                jiveMain:addNode( { id = 'settingsBrightness', iconStyle = "hm_settingsBrightness", node = 'settings', noCustom = 1, text = _globalStrings:str("BRIGHTNESS_SETTINGS"), weight = 45, windowStyle = 'text_only' })
-        end
+		jiveMain:addNode( { id = 'settings', iconStyle = 'hm_settings', node = 'home', noCustom = 1, text = _globalStrings:str("SETTINGS"), weight = 1005, })
+		jiveMain:addNode( { id = 'advancedSettings', iconStyle = 'hm_advancedSettings', node = 'settings', text = _globalStrings:str("ADVANCED_SETTINGS"), weight = 105, windowStyle = 'text_only' })
+		jiveMain:addNode( { id = 'screenSettings', iconStyle = 'hm_settingsScreen', node = 'settings', text = _globalStrings:str("SCREEN_SETTINGS"), weight = 60, windowStyle = 'text_only' })
+		jiveMain:addNode( { id = 'screenSettingsNowPlaying', node = 'screenSettings', text = _globalStrings:str("NOW_PLAYING"), windowStyle = 'text_only' })
+		jiveMain:addNode( { id = 'factoryTest', node = 'advancedSettings', noCustom = 1, text = _globalStrings:str("FACTORY_TEST"), weight = 120, windowStyle = 'text_only' })
+		jiveMain:addNode( { id = 'advancedSettingsBetaFeatures', node = 'advancedSettings', noCustom = 1, text = _globalStrings:str("BETA_FEATURES"), weight = 100, windowStyle = 'text_only' })
+		jiveMain:addNode( { id = 'networkSettings', node = 'advancedSettings', noCustom = 1, text = _globalStrings:str("NETWORK_NETWORKING"), weight = 100, windowStyle = 'text_only' })
+		jiveMain:addNode( { id = 'settingsAudio', iconStyle = "hm_settingsAudio", node = 'settings', noCustom = 1, text = _globalStrings:str("AUDIO_SETTINGS"), weight = 40, windowStyle = 'text_only' })
+		jiveMain:addNode( { id = 'settingsBrightness', iconStyle = "hm_settingsBrightness", node = 'settings', noCustom = 1, text = _globalStrings:str("BRIGHTNESS_SETTINGS"), weight = 45, windowStyle = 'text_only' })
+	end
+
+
 end
 
 --[[
@@ -653,7 +655,7 @@ end
 
 
 function JiveMain:getDefaultSkin()
-	return _defaultSkin or "QVGAportraitSkin"
+	return _defaultSkin or "QVGAlandscapeSkin"
 end
 
 
