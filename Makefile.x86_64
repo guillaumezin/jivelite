@@ -1,6 +1,6 @@
 # Jivelite makefile
 
-PREFIX ?= /Users/paddockd/source/jivelite
+PREFIX ?= ${HOME}/source/jivelite
 
 all: srcs libs
 
@@ -16,6 +16,5 @@ lib/lua:
 
 clean:
 	rm -Rf lib include
-	cd src; make clean
+	cd src; PREFIX=$(PREFIX) make -f Makefile.x86_64 clean
 	cd lib-src; PREFIX=$(PREFIX) make -f Makefile.x86_64 clean
-
