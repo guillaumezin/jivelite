@@ -56,4 +56,5 @@ dtparam=spi=on
 dtparam=audio=on
 
 # tft 2.8
-dtoverlay=pitft28-capacitive,speed=32000000,fps=25,touch-swapxy,touch-invx
+dtoverlay=pitft28-capacitive,speed=32000000,fps=20,touch-swapxy,touch-invx
+dtoverlay=pitftgpio

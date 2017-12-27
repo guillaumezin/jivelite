@@ -17,20 +17,30 @@ if [ "$_IP" ]; then
   printf "My IP address is %s\n" "$_IP"
 fi
 
-#/home/pi/wiringPi/gpio/gpio mode 0 up
-#echo 17 > /sys/class/gpio/export
+# Turn OFF HDMI
+/opt/vc/bin/tvservice -o
 
-#/home/pi/wiringPi/gpio/gpio mode 3 up
-#echo 22 > /sys/class/gpio/export
+# Turn OFF leds
+#if [ -f /sys/class/leds/led0/trigger ]
+#then
+#	echo o
+#	echo none > /sys/class/leds/led0/trigger
+#fi
+#if [ -f /sys/class/leds/led1/trigger ]
+#then
+#	echo none > /sys/class/leds/led1/trigger
+#fi
+#/home/pi/bin/llctl f0 l0 d0
 
-#/home/pi/wiringPi/gpio/gpio mode 4 up
-#echo 23 > /sys/class/gpio/export
+# Pensez à parametrer Squeezelite
+# /usr/bin/bluealsa --disable-hsp --disable-hfp &
+# /home/pi/bin/aloop &
 
-#/home/pi/wiringPi/gpio/gpio mode 2 up
-#echo 27 > /sys/class/gpio/export
+#/home/pi/bin/domoticz-start &
+#/home/pi/bin/lms-start &
 
-/home/pi/Adafruit-Retrogame/retrogame &
-
+# Pensez à parametrer Squeezelite dans /etc/default/squeezelite, à copier /etc/asound.conf.usbspeakers sur /etc/asound.conf et à mettre le son à 100% sur l'USB avec alsamixer ou amixer set PCM 100%
+# /home/pi/Adafruit-Retrogame/retrogame &
 su -s /bin/bash -c "FRAMEBUFFER=/dev/fb1 startx -- -nocursor" pi &
 
 exit 0

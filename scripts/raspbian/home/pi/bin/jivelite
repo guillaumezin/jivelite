@@ -1,13 +1,20 @@
 #!/bin/bash
 
-VAL=`cat /sys/class/gpio/gpio27/value`
+#VAL=`cat /sys/class/gpio/gpio27/value`
 
-if [ "$VAL" -eq "0" ]; then
-        export JIVE_ADMIN="admin"
+#if [ "$VAL" -eq "0" ]; then
+#        export JIVE_ADMIN="admin"
+#fi
+
+evtest --query /dev/input/keypad EV_KEY KEY_J
+
+if [ $? -eq 10 ]; then
+	export JIVE_ADMIN="admin"
 fi
 
 while true; do
 # LD_LIBRARY_PATH=/home/pi/jivelite/lib /home/pi/jivelite/bin/jivelite > ~/jivelite.log
-/home/pi/jivelite/bin/jivelite > ~/jivelite.log
+# /home/pi/jivelite/bin/jivelite > ~/jivelite.log
+/home/pi/jivelite/bin/jivelite
 sleep 1;
 done
