@@ -1,0 +1,1 @@
+sudo dtc -O dtb -o /boot/overlays/pitftgpio.dtbo -b 0 -@ pitftgpio-overlay.dts
