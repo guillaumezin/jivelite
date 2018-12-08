@@ -10,6 +10,7 @@ evtest --query /dev/input/keypad EV_KEY KEY_J
 
 if [ $? -eq 10 ]; then
 	export JIVE_ADMIN="admin"
+	sudo mount -o remount,rw /
 fi
 
 while true; do
