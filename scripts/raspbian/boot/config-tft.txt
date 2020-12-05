@@ -1,5 +1,5 @@
 # For more options and information see
-# http://www.raspberrypi.org/documentation/configuration/config-txt.md
+# http://rpf.io/configtxt
 # Some settings may impact device functionality. See link above for details
 
 # uncomment if you get no picture on HDMI for a default "safe" mode
@@ -7,7 +7,7 @@
 
 # uncomment this if your display has a black border of unused pixels visible
 # and your display can output without overscan
-#disable_overscan=1
+disable_overscan=0
 
 # uncomment the following to adjust overscan. Use positive numbers if console
 # goes off screen, and negative if there is too much border
@@ -22,7 +22,7 @@
 #framebuffer_height=720
 
 # uncomment if hdmi display is not detected and composite is being output
-#hdmi_force_hotplug=1
+hdmi_force_hotplug=0
 
 # uncomment to force a specific HDMI mode (this will force VGA)
 #hdmi_group=1
@@ -43,17 +43,38 @@
 #arm_freq=800
 
 # Uncomment some or all of these to enable the optional hardware interfaces
-dtparam=i2c_arm=on
-dtparam=i2s=on
-dtparam=spi=on
+#dtparam=i2c_arm=on
+#dtparam=i2s=on
+#dtparam=spi=on
 
-# Uncomment this to enable the lirc-rpi module
-#dtoverlay=lirc-rpi
+# Uncomment this to enable infrared communication.
+#dtoverlay=gpio-ir,gpio_pin=17
+#dtoverlay=gpio-ir-tx,gpio_pin=18
 
 # Additional overlays and parameters are documented /boot/overlays/README
 
 # Enable audio (loads snd_bcm2835)
 dtparam=audio=on
 
-# tft 2.8
-dtoverlay=pitft28-capacitive,speed=32000000,fps=25,touch-swapxy,touch-invx
+[pi4]
+# Enable DRM VC4 V3D driver on top of the dispmanx display stack
+dtoverlay=vc4-fkms-v3d
+max_framebuffers=2
+
+[all]
+dtparam=watchdog=on
+max_usb_current=1
+
+dtoverlay=gpio-key,gpio=17,keycode=57,label="KEY_SPACE"
+dtoverlay=gpio-key,gpio=22,keycode=44,label="KEY_Z"
+dtoverlay=gpio-key,gpio=23,keycode=23,label="KEY_I"
+dtoverlay=gpio-key,gpio=27,keycode=36,label="KEY_J"
+
+# --- added by adafruit-pitft-helper Sat Dec  5 17:04:12 2020 ---
+hdmi_force_hotplug=0
+dtparam=spi=on
+dtparam=i2c1=on
+dtparam=i2c_arm=on
+dtoverlay=pitft28-capacitive,speed=64000000,fps=30
+dtoverlay=pitft28-capacitive,rotate=90,touch-swapxy=true,touch-invx=true
+# --- end adafruit-pitft-helper Sat Dec  5 17:04:12 2020 ---

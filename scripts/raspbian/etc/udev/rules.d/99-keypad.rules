@@ -1,1 +1,0 @@
-SUBSYSTEM=="input", ENV{ID_PATH}=="platform-soc:keypad", SYMLINK+="input/keypad" 

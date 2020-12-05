@@ -6,11 +6,15 @@
 #        export JIVE_ADMIN="admin"
 #fi
 
-evtest --query /dev/input/keypad EV_KEY KEY_J
+evtest --query /dev/input/by-path/platform-button@1b-event EV_KEY KEY_J
 
 if [ $? -eq 10 ]; then
 	export JIVE_ADMIN="admin"
 	sudo mount -o remount,rw /
+else
+	export JIVELITE_HOME=/tmp/jivelite
+	mkdir $JIVELITE_HOME
+	cp -rf ~/.jivelite/* $JIVELITE_HOME/
 fi
 
 while true; do
