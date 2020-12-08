@@ -6,15 +6,17 @@
 #        export JIVE_ADMIN="admin"
 #fi
 
+sudo mkdir /mnt/sdcard_tmpfs/upper
+sudo mkdir /mnt/sdcard_tmpfs/work
+sudo mount /mnt/sdcard_ro
+
 evtest --query /dev/input/by-path/platform-button@1b-event EV_KEY KEY_J
 
 if [ $? -eq 10 ]; then
 	export JIVE_ADMIN="admin"
-	sudo mount -o remount,rw /
+	export JIVELITE_HOME=/mnt/sdcard_rw/jivelite_home
 else
-	export JIVELITE_HOME=/tmp/jivelite
-	mkdir $JIVELITE_HOME
-	cp -rf ~/.jivelite/* $JIVELITE_HOME/
+	export JIVELITE_HOME=/mnt/sdcard_ro/jivelite_home
 fi
 
 while true; do

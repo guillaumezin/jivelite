@@ -1,0 +1,9 @@
+proc            /proc           proc    defaults          0       0
+PARTUUID=f398ce71-01  /boot           vfat    defaults,ro          0       2
+PARTUUID=f398ce71-02  /               ext4    defaults,noatime  0       1
+# a swapfile is not a swap partition, no line here
+#   use  dphys-swapfile swap[on|off]  for that
+PARTUUID=f398ce71-03 /mnt/sdcard_rw   ext4    defaults,noatime 0 3
+tmpfs           /mnt/sdcard_tmpfs        tmpfs   defaults,noatime,nosuid,nodev,noexec,size=30m        0       0
+overlayfs /mnt/sdcard_ro overlay defaults,noauto,noatime,lowerdir=/mnt/sdcard_rw,upperdir=/mnt/sdcard_tmpfs/upper,workdir=/mnt/sdcard_tmpfs/work 0 4
+
